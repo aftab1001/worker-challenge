@@ -1,46 +1,59 @@
-import * as http from 'http';
+import axios from 'axios';
+import { Worker, isMainThread } from 'worker_threads';
 
-const workerUrl = 'http://localhost:3001/rnd?n=10';
-const sampleCount = 150;
-const timeout = 10000; // 10 seconds
-const requestsCount = 15;
+const NUM_WORKERS = 8;
+const NUM_SAMPLES = 150;
+const REQUEST_URL = 'http://localhost:3001/rnd?n=1';
+const MAX_TIME = 10000; // 10 seconds
 
 let totalSum = 0;
-const startTime = Date.now();
-let sampleCountReceived = 0;
-let requestsMade = 0;
+let totalTime = 0;
+let flakyWorkers = 0;
 
-function makeRequest() {
-    requestsMade++;
-    const request = http.get(workerUrl, (res) => {
-        res.on('data', (chunk) => {
-            // const randomNumber = parseInt(chunk.toString().split('=')[1]);
-            console.log(chunk.toString());
-            totalSum++;
-            sampleCountReceived++;
-            if (sampleCountReceived === sampleCount) {
-                const endTime = Date.now();
-                const totalTime = endTime - startTime;
-                console.log(`Total sum of collected samples: ${totalSum}`);
-                console.log(`Total time spent: ${totalTime} ms`);
-                request.abort();
+async function workerThread(workerIndex: number) {
+    try {
+        const startTime = Date.now();
+        const response = await axios.get(REQUEST_URL);
+        const data = response.data.split('\n');
+
+        data.forEach((str: any) => {
+            if (str) {
+                const [, value] = str.split('=');
+                totalSum += Number(value);
             }
         });
-        res.on('end', () => {
-            if (requestsMade < requestsCount) {
-                makeRequest();
-            } else {
-                console.log('Worker processes cleaned up and terminated.');
-            }
-        });
-    });
-    request.setTimeout(timeout, () => {
-        request.abort();
-        console.log('Timeout reached. Aborting request.');
-    });
-    request.on('error', (err) => {
-        console.log(`Error occurred: ${err.message}`);
-    });
+
+        const endTime = Date.now();
+        totalTime += endTime - startTime;
+    } catch (err: any) {
+        console.log(`Worker ${workerIndex} failed: ${err.message}`);
+        flakyWorkers++;
+    }
 }
 
-makeRequest();
+if (isMainThread) {
+    for (let i = 0; i < NUM_WORKERS; i++) {
+        const worker = new Worker(__filename);
+        worker.on('message', (message) => {
+            console.log(`Worker ${i} completed: ${message}`);
+        });
+        worker.on('error', (err) => {
+            console.log(`Worker ${i} failed: ${err.message}`);
+        });
+        worker.on('exit', (code) => {
+            if (code !== 0) {
+                console.log(`Worker ${i} stopped with exit code ${code}`);
+            }
+        });
+    }
+
+    setTimeout(() => {
+        console.log(`Total sum: ${totalSum}`);
+        console.log(`Total time: ${totalTime}`);
+        console.log(`Flaky workers: ${flakyWorkers}`);
+    }, MAX_TIME);
+} else {
+    for (let i = 0; i < NUM_SAMPLES / NUM_WORKERS; i++) {
+        workerThread(i);
+    }
+}
