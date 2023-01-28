@@ -1,0 +1,8 @@
+/node*modules/\*
+dist/*
+build/\*
+coverage/\*
+
+\*_/_.d.ts
+/src/public/
+/src/types/

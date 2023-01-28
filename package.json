@@ -1,0 +1,55 @@
+{
+    "name": "worker-challenge",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node dist/index.js",
+        "start:dev": "npm run build && node dist/index.js",
+        "clean": "rimraf coverage  dist",
+        "copy-files": "copyfiles -u 1 bin/*  dist/bin/ && copyfiles -u 1 assets/*  dist/assets/ && copyfiles -a *.env  dist/",
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "prettier": "prettier --write src/**/*.ts",
+        "prepare": "husky install",
+        "precommit": "npm run lint && npm run prettier",
+        "prebuild": "npm run lint",
+        "build": "tsc -p tsconfig.json",
+        "postbuild": "npm run copy-files",
+        "build:release": "npm run clean && tsc -p tsconfig.json",
+        "test": "jest --coverage",
+        "test:watch": "jest --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "t"
+    },
+    "keywords": [
+        "Worker",
+        "Challenge"
+    ],
+    "author": "Aftab Ur Rehman",
+    "homepage": "",
+    "devDependencies": {
+        "@types/jest": "^28.1.4",
+        "@types/node": "^18.0.6",
+        "@typescript-eslint/eslint-plugin": "^5.30.3",
+        "@typescript-eslint/parser": "^5.30.3",
+        "copyfiles": "^2.4.1",
+        "eslint": "^8.19.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "eslint-plugin-unused-imports": "^2.0.0",
+        "husky": "^8.0.1",
+        "jest": "^28.1.2",
+        "prettier": "^2.7.1",
+        "rimraf": "^3.0.2",
+        "ts-jest": "^28.0.5",
+        "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "axios": "^1.2.5",
+        "bottleneck": "^2.19.5",
+        "dotenv": "^16.0.1"
+    }
+}
