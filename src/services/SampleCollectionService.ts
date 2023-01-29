@@ -96,7 +96,7 @@ export class SampleCollectionService implements ISampleCollectionService {
         }
     }
 
-    async sendRemainderToCustomers(): Promise<void> {
+    async getSampleCollectionsFromWorkers(): Promise<void> {
         Logger.log('--------------- Executing binaries ---------------');
         const processOutput = await this.startService();
         Logger.log(processOutput);
