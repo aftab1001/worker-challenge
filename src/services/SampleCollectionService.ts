@@ -110,3 +110,4 @@ export class SampleCollectionService implements ISampleCollectionService {
         return this.shellCommandExecutor.execute();
     }
 }
+export const getSampleCollectionService = () => new SampleCollectionService(getShellCommandExecutor());
