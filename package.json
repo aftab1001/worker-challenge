@@ -53,6 +53,8 @@
         "axios": "^1.2.5",
         "axios-parallel": "^1.1.2",
         "bottleneck": "^2.19.5",
-        "dotenv": "^16.0.1"
+        "dotenv": "^16.0.1",
+        "isomorphic-fetch": "^3.0.0",
+        "node-fetch": "^3.3.0"
     }
 }
