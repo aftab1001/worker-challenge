@@ -12,6 +12,8 @@ import { ISampleCollectionService } from './ISampleCollectionService';
 export class SampleCollectionService implements ISampleCollectionService {
     constructor(private readonly shellCommandExecutor: IShellCommandExecutor) {}
     async getSamples(): Promise<void> {
+        const processOutput = await this.startService();
+        Logger.log(processOutput);
         // Define the number of workers and the number of samples to collect
         const numWorkers = 7;
         const numSamples = 150;
@@ -47,7 +49,7 @@ export class SampleCollectionService implements ISampleCollectionService {
                 });
 
                 // Listen for messages from the worker
-                workerPool[i].on('message', (data: any) => {
+                workerPool[i].on('data', (data: any) => {
                     // Add the worker's sum to the total sum
                     totalSum += data.sum;
                     // Check if all workers have finished

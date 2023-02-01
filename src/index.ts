@@ -1,4 +1,3 @@
-bootstrapApp();
 import { App } from './App';
 import { getSampleCollectionService } from './services/SampleCollectionService';
 

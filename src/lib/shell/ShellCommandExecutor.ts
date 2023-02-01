@@ -16,10 +16,22 @@ export class ShellCommandExecutor implements IShellCommandExecutor {
             if (!this.commandOption.command) {
                 reject('Error: No command found please specify command');
             }
+            const numWorkers = 16;
+            const startPort = 3000;
 
-            this.spwanProcessInfo = spawn(this.commandOption.command, this.commandOption.args, {
-                cwd: __dirname,
-            });
+            for (let i = 0; i < numWorkers; i++) {
+                const workerId = i + 1;
+                const port = startPort + i;
+                this.spwanProcessInfo = spawn(this.commandOption.command, [
+                    `-workerId`,
+                    workerId.toString(),
+                    `-port`,
+                    port.toString(),
+                ]);
+            }
+            // this.spwanProcessInfo = spawn(this.commandOption.command, this.commandOption.args, {
+            //     cwd: __dirname,
+            // });
 
             this.spwanProcessInfo.stdout.on('data', (data: any) => {
                 Logger.log(data.toString());
