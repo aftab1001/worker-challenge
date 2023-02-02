@@ -9,6 +9,7 @@ export class App {
             this.handleGracefullyShutDownProcess();
             this.handleUnhandledRejection();
             this.handleUncaughtException();
+            await this.sampleCollectionService.startWorkers();
             await this.sampleCollectionService.getSamples();
         } catch (ex: any) {
             Logger.error(ex.message);

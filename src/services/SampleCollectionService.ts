@@ -10,105 +10,67 @@ import axios from 'axios';
 import { ISampleCollectionService } from './ISampleCollectionService';
 
 export class SampleCollectionService implements ISampleCollectionService {
+    samplesPerWorker = 9;
+    maxSamples = 150;
+    workers = 20;
     constructor(private readonly shellCommandExecutor: IShellCommandExecutor) {}
     async getSamples(): Promise<void> {
-        const processOutput = await this.startService();
-        Logger.log(processOutput);
-        // Define the number of workers and the number of samples to collect
-        const numWorkers = 7;
-        const numSamples = 150;
-
-        // Define the worker timeout (in ms)
-        const workerTimeout = 10000;
-
-        // Define the worker ports
-        const workerPorts = [3001, 3002, 3003, 3004, 3005, 3006, 3007];
-
-        // Define the worker ids
-        const workerIds = [1, 2, 3, 4, 5, 6, 7];
-
-        // Define the total sum and total time variables
-        let totalSum = 0;
-        let totalTime = 0;
-
-        // Define a pool of worker threads
-        const workerPool: Worker[] = [];
-
-        // Check if the script is running in the main thread
-        if (isMainThread) {
-            // Start the performance timer
-            const startTime = performance.now();
-
-            // Initialize the worker pool
-            for (let i = 0; i < numWorkers; i++) {
-                workerPool[i] = new Worker(__filename, {
-                    workerData: {
-                        workerId: workerIds[i],
-                        port: workerPorts[i],
-                    },
-                });
-
-                // Listen for messages from the worker
-                workerPool[i].on('data', (data: any) => {
-                    // Add the worker's sum to the total sum
-                    totalSum += data.sum;
-                    // Check if all workers have finished
-                    if (totalSum >= numSamples) {
-                        // Stop the performance timer
-                        const endTime = performance.now();
-
-                        // Calculate the total time spent
-                        totalTime = endTime - startTime;
-
-                        // Log the results
-                        console.log(`Total Sum: ${totalSum}`);
-                        console.log(`Total Time: ${totalTime} ms`);
-
-                        // Terminate all worker threads
-                        workerPool.forEach((worker) => worker.terminate());
-                    }
-                });
-            }
-        } else {
-            // Define the worker URL
-            const workerUrl = `http://localhost:${workerData.port}/rnd?n=10`;
-
-            // Define the worker sum variable
-            const workerSum = 0;
-
-            // Fetch data from the worker
-            axios
-                .get(workerUrl)
-                .then((response) => {
-                    // Extract the random numbers from the response data
-                    const randomNumbers = response.data
-                        .split('\n')
-                        .filter((line: string) => line.startsWith('rnd='))
-                        .map((line: string) => parseInt(line.slice(4)));
-                    console.log(randomNumbers.length);
-                    // Add the random numbers to the worker sum
-                    randomNumbers.reduce((sum: number, num: number) => sum + num, 0);
-
-                    // Send the worker sum to the main thread
-                    (parentPort as any).postMessage({ sum: randomNumbers.length });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
+        await this.collectSamples();
     }
+    async collectSamples(): Promise<void> {
+        const startTime = Date.now();
+        let collectedSamples = 0;
+        const results: any = [];
 
-    async getSampleCollectionsFromWorkers(): Promise<void> {
+        while (collectedSamples < this.maxSamples) {
+            const promises = [];
+            for (let i = 0; i < this.workers; i++) {
+                const workerId = i + 1;
+                const port = 3000 + workerId;
+                promises.push(
+                    axios
+                        .get(`http://localhost:${port}/rnd?n=${this.samplesPerWorker}`)
+                        .then((response: { data: any }) => response.data)
+                        .catch((error: any) => error),
+                );
+            }
+
+            try {
+                const workerResults = await Promise.all(promises);
+                workerResults.forEach((workerData) => {
+                    workerData.split('\n').forEach((line: string) => {
+                        const parts = line.split('=');
+                        if (parts.length === 2) {
+                            results.push(parseInt(parts[1]));
+                            collectedSamples++;
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error(`Error collecting samples from worker: ${err}`);
+            }
+        }
+
+        console.log('All workers have finished generating random numbers.');
+
+        let totalSum = 0;
+        results.forEach((num: number) => {
+            totalSum += num;
+        });
+        console.log(`The total number of sample count are: ${results.length}`);
+        console.log(`The total sum of all samples is ${totalSum}`);
+        console.log(`The total time spent is ${Date.now() - startTime}ms`);
+    }
+    async startWorkers(): Promise<void> {
         Logger.log('--------------- Executing binaries ---------------');
-        const processOutput = await this.startService();
-        Logger.log(processOutput);
+        await this.startService();
     }
 
     kill(): void {
         this.shellCommandExecutor.kill();
     }
 
-    private async startService(): Promise<string> {
+    private async startService(): Promise<void> {
         return this.shellCommandExecutor.execute();
     }
 }

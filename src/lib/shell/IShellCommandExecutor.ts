@@ -4,6 +4,6 @@ export interface ICommandOption {
     cwd?: true;
 }
 export interface IShellCommandExecutor {
-    execute(): Promise<string>;
+    execute(): Promise<void>;
     kill(): void;
 }
