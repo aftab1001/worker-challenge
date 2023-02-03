@@ -1,5 +1,5 @@
 import path from 'path';
-import { APP_PATH } from './RootPath';
+import { APP_PATH } from './AppPath';
 
 const binaryCommandsBasePath = path.resolve(APP_PATH, 'bin/');
 const binaryCommands: { [key: string]: string } = {

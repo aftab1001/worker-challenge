@@ -1,6 +1,6 @@
 import { getBinaryCommand } from '../src/binaryCommands';
 import path from 'path';
-import { APP_PATH } from '../src/RootPath';
+import { APP_PATH } from '../src/AppPath';
 
 describe('getBinaryCommand', () => {
     const binaryCommandsBasePath = path.resolve(APP_PATH, 'bin/');

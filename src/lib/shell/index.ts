@@ -1,2 +1,2 @@
-export { ShellCommandExecutor, getShellCommandExecutor } from './ShellCommandExecutor';
-export { IShellCommandExecutor, ICommandOption } from './IShellCommandExecutor';
+export { BinaryCommandExecutor, getBinaryCommandExecutor } from './BinaryCommandExecutor';
+export { IBinaryCommandExecutor, ICommandOption } from './IBinaryCommandExecutor';

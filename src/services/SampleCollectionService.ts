@@ -1,61 +1,47 @@
-import { IShellCommandExecutor } from '../lib/shell/IShellCommandExecutor';
-import { Config } from '../config/config';
+import { IBinaryCommandExecutor } from '../lib/shell/IBinaryCommandExecutor';
+import { AppConfiguration } from '../config/AppConfiguration';
 import { Logger } from '../helpers/Logger';
-import { getShellCommandExecutor } from '../lib/shell';
-import axios from 'axios';
+import { getBinaryCommandExecutor } from '../lib/shell';
 import { ISampleCollectionService } from './ISampleCollectionService';
+import { ApiClient } from '../lib/http/ApiClient';
 
 export class SampleCollectionService implements ISampleCollectionService {
-
-    constructor(private readonly shellCommandExecutor: IShellCommandExecutor) { }
+    constructor(private readonly shellCommandExecutor: IBinaryCommandExecutor, private readonly apiClient: ApiClient) {}
     async getSamples(): Promise<void> {
         await this.startService();
         await this.collectSamples();
+        await this.cleanUpWorkers();
     }
 
     async collectSamples(): Promise<void> {
         const startTime = Date.now();
         let collectedSamples = 0;
-        const results: any = [];
+        const results: number[] = [];
 
-        while (collectedSamples < Config.MaxSampleCollection) {
-            const promises = [];
-            for (let i = 0; i < Config.NumberOfWorkers; i++) {
-                const workerId = i + 1;
-                const port = Config.WorkerStartingPort + workerId;
-                promises.push(
-                    axios
-                        .get(`${Config.WorkerStartingEndPointUrl}:${port}/rnd?n=${Config.SamplePerWorker}`)
-                        .then((response: { data: any }) => response.data)
-                        .catch((error: any) => error),
-                );
-            }
-
+        while (collectedSamples < AppConfiguration.MaxSampleCollection) {
             try {
-                const workerResults = await Promise.all(promises);
+                const workerResults = await Promise.all(
+                    Array.from({ length: AppConfiguration.NumberOfWorkers }, (_, i) => {
+                        const workerId = i + 1;
+                        return this.apiClient.collectData(workerId);
+                    }),
+                );
+
                 workerResults.forEach((workerData) => {
-                    workerData.split('\n').forEach((line: string) => {
-                        const parts = line.split('=');
-                        if (parts.length === 2) {
-                            results.push(parseInt(parts[1]));
-                            collectedSamples++;
-                        }
-                    });
+                    results.push(...workerData);
+                    collectedSamples += workerData.length;
                 });
             } catch (err) {
-                console.error(`Error collecting samples from worker: ${err}`);
+                Logger.error(`Error collecting samples from worker: ${err}`);
             }
         }
 
-        console.log('All workers have finished generating random numbers.');
+        Logger.log('All workers have finished generating random numbers.');
+        const totalSum = results.reduce((acc, num) => acc + num, 0);
 
-        let totalSum = 0;
-        results.forEach((num: number) => {
-            totalSum += num;
-        });
-        console.log(`The total number of sample count are: ${results.length}`);
-        console.log(`The total sum of all samples is ${totalSum}`);
-        console.log(`The total time spent is ${Date.now() - startTime}ms`);
+        Logger.log(`The total number of sample count are: ${results.length}`);
+        Logger.log(`The total sum of all samples is ${totalSum}`);
+        Logger.log(`The total time spent is ${Date.now() - startTime}ms`);
     }
 
     async startWorkers(): Promise<void> {
@@ -63,12 +49,13 @@ export class SampleCollectionService implements ISampleCollectionService {
         await this.startService();
     }
 
-    kill(): void {
-        this.shellCommandExecutor.kill();
+    async cleanUpWorkers() {
+        await this.shellCommandExecutor.cleanupWorkers();
     }
 
     private async startService(): Promise<void> {
         return this.shellCommandExecutor.execute();
     }
 }
-export const getSampleCollectionService = () => new SampleCollectionService(getShellCommandExecutor());
+export const getSampleCollectionService = () =>
+    new SampleCollectionService(getBinaryCommandExecutor(), new ApiClient());

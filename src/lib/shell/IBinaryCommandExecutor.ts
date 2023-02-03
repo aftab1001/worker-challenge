@@ -3,7 +3,7 @@ export interface ICommandOption {
     args?: string[] | undefined;
     cwd?: true;
 }
-export interface IShellCommandExecutor {
+export interface IBinaryCommandExecutor {
     execute(): Promise<void>;
-    kill(): void;
+    cleanupWorkers(): void;
 }

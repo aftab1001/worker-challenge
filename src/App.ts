@@ -2,7 +2,7 @@ import { Logger } from './helpers/Logger';
 import { ISampleCollectionService } from './services/ISampleCollectionService';
 
 export class App {
-    constructor(private readonly sampleCollectionService: ISampleCollectionService) { }
+    constructor(private readonly sampleCollectionService: ISampleCollectionService) {}
 
     public async init(): Promise<void> {
         try {
@@ -12,12 +12,6 @@ export class App {
         } catch (ex: any) {
             Logger.error(ex.message);
         }
-    }
-
-    private handleGracefullyShutDownProcess(): void {
-        process.on('SIGINT', () => {
-            this.sampleCollectionService.kill();
-        });
     }
 
     private handleUnhandledRejection() {
