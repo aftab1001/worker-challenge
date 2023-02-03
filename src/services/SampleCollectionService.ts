@@ -1,35 +1,31 @@
-import { ShellCommandExecutor } from '../lib/shell';
-import { ICommandOption, IShellCommandExecutor } from '../lib/shell/IShellCommandExecutor';
+import { IShellCommandExecutor } from '../lib/shell/IShellCommandExecutor';
 import { Config } from '../config/config';
-import { getBinaryCommand } from '../binaryCommands';
 import { Logger } from '../helpers/Logger';
 import { getShellCommandExecutor } from '../lib/shell';
-import { Worker, isMainThread, workerData, parentPort } from 'worker_threads';
-import { performance } from 'perf_hooks';
 import axios from 'axios';
 import { ISampleCollectionService } from './ISampleCollectionService';
 
 export class SampleCollectionService implements ISampleCollectionService {
-    samplesPerWorker = 9;
-    maxSamples = 150;
-    workers = 20;
-    constructor(private readonly shellCommandExecutor: IShellCommandExecutor) {}
+
+    constructor(private readonly shellCommandExecutor: IShellCommandExecutor) { }
     async getSamples(): Promise<void> {
+        await this.startService();
         await this.collectSamples();
     }
+
     async collectSamples(): Promise<void> {
         const startTime = Date.now();
         let collectedSamples = 0;
         const results: any = [];
 
-        while (collectedSamples < this.maxSamples) {
+        while (collectedSamples < Config.MaxSampleCollection) {
             const promises = [];
-            for (let i = 0; i < this.workers; i++) {
+            for (let i = 0; i < Config.NumberOfWorkers; i++) {
                 const workerId = i + 1;
-                const port = 3000 + workerId;
+                const port = Config.WorkerStartingPort + workerId;
                 promises.push(
                     axios
-                        .get(`http://localhost:${port}/rnd?n=${this.samplesPerWorker}`)
+                        .get(`${Config.WorkerStartingEndPointUrl}:${port}/rnd?n=${Config.SamplePerWorker}`)
                         .then((response: { data: any }) => response.data)
                         .catch((error: any) => error),
                 );
@@ -61,6 +57,7 @@ export class SampleCollectionService implements ISampleCollectionService {
         console.log(`The total sum of all samples is ${totalSum}`);
         console.log(`The total time spent is ${Date.now() - startTime}ms`);
     }
+
     async startWorkers(): Promise<void> {
         Logger.log('--------------- Executing binaries ---------------');
         await this.startService();

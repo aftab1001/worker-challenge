@@ -2,14 +2,12 @@ import { Logger } from './helpers/Logger';
 import { ISampleCollectionService } from './services/ISampleCollectionService';
 
 export class App {
-    constructor(private readonly sampleCollectionService: ISampleCollectionService) {}
+    constructor(private readonly sampleCollectionService: ISampleCollectionService) { }
 
     public async init(): Promise<void> {
         try {
-            this.handleGracefullyShutDownProcess();
             this.handleUnhandledRejection();
             this.handleUncaughtException();
-            await this.sampleCollectionService.startWorkers();
             await this.sampleCollectionService.getSamples();
         } catch (ex: any) {
             Logger.error(ex.message);

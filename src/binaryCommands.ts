@@ -2,7 +2,7 @@ import path from 'path';
 import { APP_PATH } from './RootPath';
 
 const binaryCommandsBasePath = path.resolve(APP_PATH, 'bin/');
-const binaryCommands: any = {
+const binaryCommands: { [key: string]: string } = {
     win32: 'worker.windows',
     linux: 'worker.linux',
     darwin: 'worker.mac',
