@@ -1,6 +1,6 @@
-import { getBinaryCommand } from '../src/binaryCommands';
+import { getBinaryCommand } from '../../../src/binaryCommands';
 import path from 'path';
-import { APP_PATH } from '../src/AppPath';
+import { APP_PATH } from '../../../src/AppPath';
 
 describe('getBinaryCommand', () => {
     const binaryCommandsBasePath = path.resolve(APP_PATH, 'bin/');
@@ -9,22 +9,22 @@ describe('getBinaryCommand', () => {
     });
 
     it('should return the correct binary command for Windows', () => {
-        jest.doMock('process', () => ({ platform: 'win32' }));
+        Object.defineProperty(process, 'platform', { value: 'win32' });
         expect(getBinaryCommand()).toEqual(`${binaryCommandsBasePath}\\worker.windows`);
     });
 
     it('should return the correct binary command for Linux', () => {
-        jest.doMock('process', () => ({ platform: 'linux' }));
+        Object.defineProperty(process, 'platform', { value: 'linux' });
         expect(getBinaryCommand()).toEqual(`${binaryCommandsBasePath}\\worker.linux`);
     });
 
     it('should return the correct binary command for macOS', () => {
-        jest.doMock('process', () => ({ platform: 'darwin' }));
-        expect(getBinaryCommand()).toEqual(`${binaryCommandsBasePath}\\/worker.mac`);
+        Object.defineProperty(process, 'platform', { value: 'darwin' });
+        expect(getBinaryCommand()).toEqual(`${binaryCommandsBasePath}\\worker.mac`);
     });
 
     it('should return the default binary command for unknown platform', () => {
-        jest.doMock('process', () => ({ platform: 'unknown' }));
+        Object.defineProperty(process, 'platform', { value: 'unknown' });
         expect(getBinaryCommand()).toEqual(`${binaryCommandsBasePath}\\worker.windows`);
     });
 });
