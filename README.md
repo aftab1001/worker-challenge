@@ -9,6 +9,7 @@ This app is designed to perform sample collection and calculation efficiently. T
 ### Known issues:
 
 1.The current application only accumulates the received random numbers without eliminating duplicates.
+
 2. The value of "N" is static within the app. By default, it operates with 15 workers and sends each worker a value of 10, which can be enhanced to perfect the application's performance.
 
 ### Flaky Workers:
