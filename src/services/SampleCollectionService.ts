@@ -41,7 +41,7 @@ export class SampleCollectionService implements ISampleCollectionService {
 
         Logger.log(`The total number of sample count are: ${results.length}`);
         Logger.log(`The total sum of all samples is ${totalSum}`);
-        Logger.log(`The total time spent is ${Date.now() - startTime}ms`);
+        Logger.log(`The total time spent is ${Date.now() - startTime}ms` + '\n\n');
     }
 
     async startWorkers(): Promise<void> {

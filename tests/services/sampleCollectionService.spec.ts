@@ -10,7 +10,7 @@ describe('SampleCollectionService', () => {
 
     beforeEach(() => {
         apiClientMock = {
-            collectData: jest.fn().mockResolvedValue([1, 2, 3])
+            collectData: jest.fn().mockResolvedValue([1, 2, 3,4])
         } as any;
 
         shellCommandExecutorMock = {

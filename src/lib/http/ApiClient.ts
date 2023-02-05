@@ -9,10 +9,10 @@ export class ApiClient {
 
         try {
             const response = await axios.get(url);
-            return response.data.split('\n').map((line: string) => {
-                const parts = line.split('=');
-                return parts.length === 2 ? parseInt(parts[1]) : 0;
-            });
+            return response.data
+                .split('\n')
+                .filter((line: string) => line.trim().length > 0)
+                .map((line: string) => +line.replace(/^\D+/g, ''));
         } catch (err) {
             Logger.error(`Error collecting data from worker: ${err}`);
             return [];
