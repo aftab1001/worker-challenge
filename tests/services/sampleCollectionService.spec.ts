@@ -1,4 +1,4 @@
-import { SampleCollectionService, getSampleCollectionService } from '../../src/services/SampleCollectionService';
+import { SampleCollectionService } from '../../src/services/SampleCollectionService';
 import { IBinaryCommandExecutor } from '../../src/lib/shell/IBinaryCommandExecutor';
 import { AppConfiguration } from '../../src/config/AppConfiguration';
 import { ApiClient } from '../../src/lib/http/ApiClient';
@@ -43,14 +43,5 @@ describe('SampleCollectionService', () => {
         await service.cleanUpWorkers();
 
         expect(shellCommandExecutorMock.cleanupWorkers).toHaveBeenCalled();
-    });
-
-});
-
-describe('getSampleCollectionService', () => {
-    it('should return an instance of SampleCollectionService', () => {
-        const service = getSampleCollectionService();
-
-        expect(service).toBeInstanceOf(SampleCollectionService);
     });
 });

@@ -24,7 +24,7 @@ export class SampleCollectionService implements ISampleCollectionService {
                     Array.from({ length: AppConfiguration.NumberOfWorkers }, (_, i) => {
                         const workerId = i + 1;
                         return this.apiClient.collectData(workerId);
-                    }),
+                    })
                 );
 
                 workerResults.forEach((workerData) => {
@@ -57,5 +57,4 @@ export class SampleCollectionService implements ISampleCollectionService {
         return this.shellCommandExecutor.execute();
     }
 }
-export const getSampleCollectionService = () =>
-    new SampleCollectionService(getBinaryCommandExecutor(), new ApiClient());
+export const getSampleCollectionService = () => new SampleCollectionService(getBinaryCommandExecutor(), new ApiClient());

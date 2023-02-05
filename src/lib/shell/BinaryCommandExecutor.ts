@@ -54,5 +54,5 @@ export class BinaryCommandExecutor implements IBinaryCommandExecutor {
 export const getBinaryCommandExecutor = () =>
     new BinaryCommandExecutor(<ICommandOption>{
         command: getBinaryCommand(),
-        args: [],
+        args: []
     });

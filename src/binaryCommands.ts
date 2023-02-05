@@ -5,7 +5,7 @@ const binaryCommandsBasePath = path.resolve(APP_PATH, 'bin/');
 const binaryCommands: { [key: string]: string } = {
     win32: 'worker.windows',
     linux: 'worker.linux',
-    darwin: 'worker.mac',
+    darwin: 'worker.mac'
 };
 
 export function getBinaryCommand(): string {
