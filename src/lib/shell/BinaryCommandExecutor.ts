@@ -13,25 +13,25 @@ export class BinaryCommandExecutor implements IBinaryCommandExecutor {
         this.workers = [];
     }
 
-    execute(): Promise<void> {
-        return new Promise((_resolve, reject) => {
-            if (!this.commandOption.command) {
+    execute({ flaky = false }: { flaky?: boolean } = {}): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const { command } = this.commandOption;
+            if (!command) {
                 reject('Error: No command found please specify command');
             }
-
             const startWorkers = () => {
                 for (let i = 0; i < AppConfiguration.NumberOfWorkers; i++) {
                     const workerId = i + 1;
                     const port = AppConfiguration.WorkerStartingPort + workerId;
-                    const cmd = `${this.commandOption.command} -workerId ${workerId} -port ${port}`;
+                    const cmd = `${command} -workerId ${workerId} -port ${port}${flaky ? ' -flaky' : ''}`;
                     const worker = spawn(cmd, { shell: true, stdio: 'inherit' });
-                    if (worker.pid) {
-                        this.workers.push(worker.pid);
-                    } else {
+                    if (!worker.pid) {
                         Logger.error('Failed to spawn child process');
+                    } else {
+                        this.workers.push(worker.pid);
                     }
                 }
-                _resolve();
+                resolve();
             };
 
             startWorkers();

@@ -6,7 +6,7 @@ import { ISampleCollectionService } from './ISampleCollectionService';
 import { ApiClient } from '../lib/http/ApiClient';
 
 export class SampleCollectionService implements ISampleCollectionService {
-    constructor(private readonly shellCommandExecutor: IBinaryCommandExecutor, private readonly apiClient: ApiClient) {}
+    constructor(private readonly binaryCommandExecutor: IBinaryCommandExecutor, private readonly apiClient: ApiClient) {}
     async getSamples(): Promise<void> {
         await this.startService();
         await this.collectSamples();
@@ -50,11 +50,11 @@ export class SampleCollectionService implements ISampleCollectionService {
     }
 
     async cleanUpWorkers() {
-        await this.shellCommandExecutor.cleanupWorkers();
+        await this.binaryCommandExecutor.cleanupWorkers();
     }
 
     private async startService(): Promise<void> {
-        return this.shellCommandExecutor.execute();
+        return this.binaryCommandExecutor.execute();
     }
 }
 export const getSampleCollectionService = () => new SampleCollectionService(getBinaryCommandExecutor(), new ApiClient());

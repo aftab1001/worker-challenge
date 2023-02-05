@@ -1,6 +1,5 @@
 import { SampleCollectionService } from '../../src/services/SampleCollectionService';
 import { IBinaryCommandExecutor } from '../../src/lib/shell/IBinaryCommandExecutor';
-import { AppConfiguration } from '../../src/config/AppConfiguration';
 import { ApiClient } from '../../src/lib/http/ApiClient';
 
 describe('SampleCollectionService', () => {
@@ -10,7 +9,7 @@ describe('SampleCollectionService', () => {
 
     beforeEach(() => {
         apiClientMock = {
-            collectData: jest.fn().mockResolvedValue([1, 2, 3,4])
+            collectData: jest.fn().mockResolvedValue([1, 2, 3, 4])
         } as any;
 
         shellCommandExecutorMock = {
