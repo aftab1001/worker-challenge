@@ -7,5 +7,5 @@ export class AppConfiguration {
     public static WorkerStartingPort = process.env.WorkerStartingPort ? parseInt(process.env.WorkerStartingPort, 10) : 3000;
     public static WorkerStartingEndPointUrl = process.env.WorkerStartingEndPointUrl;
     public static SamplePerWorker = process.env.SamplePerWorker;
-    public static MaxSampleCollection = process.env.MaxSampleCollection ? parseInt(process.env.MaxSampleCollection) : 150;
+    public static MaxSampleCollection = process.env.MaxSampleCollection ? parseInt(process.env.MaxSampleCollection, 10) : 150;
 }
