@@ -8,17 +8,16 @@ This app is designed to perform sample collection and calculation efficiently. T
 
 ### Known issues:
 
-1.The current application only accumulates the received random numbers without eliminating duplicates.
-
-2. The value of "N" is static within the app. By default, it operates with 15 workers and sends each worker a value of 10, which can be enhanced to perfect the application's performance.
+- The current application only accumulates the received random numbers without eliminating duplicates and doing the sorting.
+- The value of "N" is static within the app. By default, it operates with 15 workers and sends each worker a value of 10, which can be enhanced to perfect the application's performance.
 
 ### Flaky Workers:
 
-I've just writtent the logic to run the flaky worker but not utilizing the flaky worker . The logic has not been tested but for flaky workers we need to initialize a pool of workers, assigning a unique identifier to each one.
-Set a timer and regularly ping each worker in the pool.
-Evaluate the response time of each worker to determine if it is functioning optimally or is flaky.
-In case a worker is deemed flaky, remove it from the pool and continue executing tasks using the remaining workers.
-Continuously repeat this process until all tasks have been completed or there are no more workers left in the pool.
+- I've just writtent the logic to run the flaky worker but not utilizing the flaky worker . The logic has not been tested but for flaky workers we need to initialize a pool of workers, assigning a unique identifier to each one.
+- Set a timer and regularly ping each worker in the pool.
+- Evaluate the response time of each worker to determine if it is flaky.
+- In case a worker is deemed flaky, remove it from the pool and continue executing tasks using the remaining workers.
+- Continuously repeat this process until all tasks have been completed or there are no more workers left in the pool.
 
 ### Unit Test Coverage:
 
