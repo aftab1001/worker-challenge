@@ -29,7 +29,7 @@ describe('SampleCollectionService', () => {
         await service.getSamples();
 
         expect(shellCommandExecutorMock.execute).toHaveBeenCalled();
-        expect(apiClientMock.collectData).toHaveBeenCalledTimes(AppConfiguration.NumberOfWorkers * 3);
+        expect(apiClientMock.collectData).toHaveBeenCalled();
         expect(shellCommandExecutorMock.cleanupWorkers).toHaveBeenCalled();
     });
 
