@@ -31,7 +31,11 @@ export class BinaryCommandExecutor implements IBinaryCommandExecutor {
                         this.workers.push(worker.pid);
                     }
                 }
-                resolve();
+                if (this.workers.length == AppConfiguration.NumberOfWorkers) {
+                    setTimeout(() => {
+                        resolve();
+                    }, 100);
+                }
             };
 
             startWorkers();
