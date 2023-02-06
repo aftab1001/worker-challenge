@@ -34,7 +34,7 @@ export class BinaryCommandExecutor implements IBinaryCommandExecutor {
                 if (this.workers.length == AppConfiguration.NumberOfWorkers) {
                     setTimeout(() => {
                         resolve();
-                    }, 100);
+                    }, 500);
                 }
             };
 
