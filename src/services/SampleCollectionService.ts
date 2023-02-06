@@ -54,7 +54,7 @@ export class SampleCollectionService implements ISampleCollectionService {
     }
 
     private async startService(): Promise<void> {
-        return this.binaryCommandExecutor.execute();
+        return await this.binaryCommandExecutor.execute();
     }
 }
 export const getSampleCollectionService = () => new SampleCollectionService(getBinaryCommandExecutor(), new ApiClient());
